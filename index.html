@@ -1,0 +1,136 @@
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title> test upload page </title>
+</head>
+<body>
+
+<form action="upload.php" method="post" enctype="multipart/form-data">
+file:  <input type="file" class="upload_file" id="upload_file_0" name="upload_file[]" /> <br />
+            <label for="upload_file_0" class=" " >
+                <img id="up_img_0" alt="aaa" width=50 height=50 />
+            </label>
+    	<input type="hidden" id="upload_file_data_0" name="upload_file_data[]" value="" />
+
+<input type="submit" id="submit_button" name="submit" value="上传" />
+
+</form>
+
+
+<script src="zepto.min.js" type="text/javascript"></script>
+<script src="exif.js" type="text/javascript"></script>
+ <script type="text/javascript">
+        var MAX_SIZE = 1024;
+
+        $.fn.localResizeIMG = function(obj) {
+            this.on('change', function() {
+                
+                var file_path = this.files[0];
+
+                load_image(file_path);
+            });
+
+            function load_image(file_path) {
+            	if (! file_path.type.match(/image.*/)) {
+            		if (window.console) {
+            			console.log("我说哥哥，只能选图片");
+            		}
+            		else {
+            			window.confirm("我说哥哥，只能选图片啊");
+            		}
+            		return ;
+            	}
+            	
+            	var reader = new FileReader() ;
+            	reader.onloadend = function(e) {
+            		//获取到图片内容，准备渲染 (内容是base64滴，还带header)
+            		render(e.target.result);
+            	};
+            	
+            	reader.readAsDataURL(file_path);
+            };
+            
+            function render(img_data) {
+                var img = new Image() ;
+                img.src = img_data; //先把图啊，用个img对象装起来
+
+                img.onload = function () {
+                    var this_img = this;
+
+                    var w = this_img.width,
+                        h = this_img.height,
+                        scale = w/h;   //宽高比
+					
+					//计算缩放之后的宽高
+					if (Math.min(w,h) > MAX_SIZE) {
+						if (w > h) {
+							h=MAX_SIZE; w=h*scale;
+						}
+						else {
+							w=MAX_SIZE; h = w/scale;
+						}
+					}
+
+					//取exif.orientation
+					
+					EXIF.getData(this);
+					var orientation = EXIF.getTag(this, "Orientation") || 1;
+					
+					var rotate_degree = 0;
+					switch(orientation) {
+						case 1:
+							rotate_degree = 0; break;
+						case 8:
+							rotate_degree = 90; break;
+						case 3:
+							rotate_degree = 180; break;
+						case 6:
+							rotate_degree = 270; break;
+						
+					}
+					
+					alert("rotate_degree:"+rotate_degree+ " w:"+w+" h:"+h);
+
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    $(canvas).attr({width: w, height: h});
+                    ctx.save();
+                    ctx.translate(h/2,w/2);
+                    ctx.rotate(rotate_degree*Math.PI/180);
+                   
+                    ctx.drawImage(this_img, 0, 0);
+                    ctx.restore();
+
+                    var base64 = canvas.toDataURL("image/jpeg", obj.quality || 0.8);
+
+                    var result = {
+                        base64: base64,
+                        clearBase64: base64.substr( base64.indexOf(',') + 1 )
+                    };
+                    
+                    obj.success(result);
+
+                };
+            }
+        };
+
+
+
+        $(function() {
+            $(".upload_file").each(function(index, el) {
+                console.log(this);
+                $(this).html("<script type='text/javascript'>\
+                	$('#upload_file_"+ index+"').localResizeIMG({\
+                		success: function (result) {\
+                			$('#up_img_"+index+"').attr({src:result.base64});\
+                			$('#upload_file_data_"+index+"').val(result.base64);\
+                			$('#upload_file_"+index+"').val('');\
+                	}}); <\/script>");
+            });
+        });
+        
+        
+    </script>
+
+</body>
+</html>
