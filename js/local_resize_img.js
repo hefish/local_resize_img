@@ -94,14 +94,16 @@ $.fn.local_resize_img = function(obj) {
 			ctx.drawImage(this_img, -w/2,-h/2, w,h);	                
             ctx.restore();
 
-            try {
-                var base64 = canvas.toDataURL("image/jpeg", obj.quality || 0.8);
+            var base64 = canvas.toDataURL("image/jpeg", obj.quality || 0.8);
+
+            if (base64.indexOf("image/jpeg") > 0) {
             }
-            catch(e) {
-                var encoder = new JPEGEncoder(obj.quality*100 || 80);
+            else {
+                alert("jpeg encoder working...");
+                var encoder = new JPEGEncoder(80);
                 var img_data = ctx.getImageData(0,0,canvas_width,canvas_height);
-	            var base64 = encoder.encode(img_data, obj.quality*100 || 80);
-            }
+	            base64 = encoder.encode(img_data);
+            } 
 
             var result = {
                 base64: base64,
