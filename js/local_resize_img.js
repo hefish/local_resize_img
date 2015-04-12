@@ -77,9 +77,8 @@ $.fn.local_resize_img = function(obj) {
 			}
 
 			var canvas = document.createElement('canvas');
-			$(canvas).css("border", "1px solid #000000");
             var ctx = canvas.getContext('2d');
-            ctx.save();
+//            ctx.save();
             if (rotate_degree == 90 || rotate_degree == -90) {
                 $(canvas).attr({width: h, height: w});
             }else {
@@ -92,20 +91,21 @@ $.fn.local_resize_img = function(obj) {
             ctx.rotate(rotate_degree * Math.PI/180);
             
 			ctx.drawImage(this_img, -w/2,-h/2, w,h);	                
-            ctx.restore();
+//            ctx.restore();
 
-            try {
-                var base64 = canvas.toDataURL("image/jpeg", obj.quality || 0.8);
+            var base64 = canvas.toDataURL("image/jpeg", obj.quality || 0.8);
+
+            if (base64.indexOf("image/jpeg") > 0) {
             }
-            catch(e) {
-                var encoder = new JPEGEncoder(obj.quality*100 || 80);
+            else {
+                var encoder = new JPEGEncoder(80);
                 var img_data = ctx.getImageData(0,0,canvas_width,canvas_height);
-	            var base64 = encoder.encode(img_data, obj.quality*100 || 80);
-            }
+	            base64 = encoder.encode(img_data);
+            } 
 
             var result = {
                 base64: base64,
-                clearBase64: base64.substr( base64.indexOf(',') + 1 )
+                lit_base64: base64.substr( base64.indexOf(',') + 1 )
             };
             
             obj.success(result);
