@@ -20,6 +20,7 @@ file:  <input type="file" class="upload_file" id="upload_file_0" name="upload_fi
 <script src="js/zepto.min.js" type="text/javascript"></script>
 <script src="js/exif.js" type="text/javascript"></script>
 <script src="js/jpegencoder.js" type="text/javascript"></script>
+<script src="js/megapix-image.js" type="text/javascript"></script>
 <script src="js/local_resize_img.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function() {
@@ -28,7 +29,7 @@ file:  <input type="file" class="upload_file" id="upload_file_0" name="upload_fi
             $(this).html("<script type='text/javascript'>\
             	$('#upload_file_"+ index+"').local_resize_img({\
             		success: function (result) {\
-            			$('#up_img_"+index+"').attr({src:result.lit_base64});\
+            			$('#up_img_"+index+"').attr({src:result.base64});\
             			$('#upload_file_data_"+index+"').val(result.base64);\
             			$('#upload_file_"+index+"').val('');\
             	}}); <\/script>");

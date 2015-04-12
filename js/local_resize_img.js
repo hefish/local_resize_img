@@ -16,6 +16,18 @@ $.fn.local_resize_img = function(obj) {
         load_image(file_path);
     });
 
+    function is_android() {
+        var ua = navigator.userAgent.toLowerCase();
+        is_android_browser = ua.indexOf("android") > -1;
+        return is_android_browser;
+    }
+
+    function is_ios() {
+        var ua = navigator.userAgent.toLowerCase();
+        is_android_browser = ua.indexOf("iphone") > -1;
+        return is_android_browser;   
+    }
+
     function load_image(file_path) {
         if (! file_path.type.match(/image.*/)) {
             if (window.console) {
@@ -81,36 +93,28 @@ $.fn.local_resize_img = function(obj) {
             var canvas = document.createElement('canvas');
             var ctx = canvas.getContext('2d');
             
-            var lit_canvas = document.createElement('canvas');
-            var lit_ctx = lit_canvas.getContext('2d');
-            
             if (rotate_degree == 90 || rotate_degree == -90) {
                 $(canvas).attr({width: h, height: w});
-                $(lit_canvas).attr({width: lit_h, height: lit_w});
+
             }else {
                 $(canvas).attr({width: w, height: h});
-                $(lit_canvas).attr({width: lit_w, height: lit_h});
             }
             
 			//draw on big resized canvas MAX_SIZE
             var canvas_width = $(canvas).attr("width");
             var canvas_height = $(canvas).attr("height");
             
-            ctx.translate(canvas_width/2, canvas_height/2);
-            ctx.rotate(rotate_degree * Math.PI/180);
-            ctx.drawImage(this_img, -w/2,-h/2, w,h);
-            
-            //draw on thumbnail canvas  LIT_SIZE
-            var lit_canvas_w = $(lit_canvas).attr("width");
-            var lit_canvas_h = $(lit_canvas).attr("height");
-            
-            lit_ctx.translate(lit_canvas_w/2, lit_canvas_h/2);
-            lit_ctx.rotate(rotate_degree * Math.PI/180);
-            lit_ctx.drawImage(this_img, -lit_w/2, -lit_h/2, lit_w, lit_h);                
+            if (is_ios()) {
+                var mp_img = new MegaPixImage(img);
+                mp_img.render(canvas, {maxWidth:w, maxHeight:h, orientation:orientation});
+            }else {
+                ctx.translate(canvas_width/2, canvas_height/2);
+                ctx.rotate(rotate_degree * Math.PI/180);
+                ctx.drawImage(this_img, -w/2,-h/2, w,h); 
+            }
             
 
             var base64 = canvas.toDataURL("image/jpeg", 0.8);
-            var lit_base64 = lit_canvas.toDataURL("image/jpeg", 0.8);
 
             if (base64.indexOf("image/jpeg") > 0) {
             }
@@ -122,7 +126,7 @@ $.fn.local_resize_img = function(obj) {
 
             var result = {
                 base64: base64,
-                lit_base64: lit_base64
+                
             };
             
             obj.success(result);
