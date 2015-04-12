@@ -11,7 +11,6 @@ file:  <input type="file" class="upload_file" id="upload_file_0" name="upload_fi
                 <img id="up_img_0" alt="aaa" width=50 height=50 />
             </label>
     	<input type="hidden" id="upload_file_data_0" name="upload_file_data[]" value="" />
-    	<input type="hidden" id="upload_file_name_0" name="upload_file_name[]" value="" />
 
 <input type="submit" id="submit_button" name="submit" value="上传" />
 
@@ -29,7 +28,7 @@ file:  <input type="file" class="upload_file" id="upload_file_0" name="upload_fi
             $(this).html("<script type='text/javascript'>\
             	$('#upload_file_"+ index+"').local_resize_img({\
             		success: function (result) {\
-            			$('#up_img_"+index+"').attr({src:result.base64});\
+            			$('#up_img_"+index+"').attr({src:result.lit_base64});\
             			$('#upload_file_data_"+index+"').val(result.base64);\
             			$('#upload_file_"+index+"').val('');\
             	}}); <\/script>");
